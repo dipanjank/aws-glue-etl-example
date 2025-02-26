@@ -21,6 +21,7 @@ def main():
 
     glueContext = GlueContext(spark_session.sparkContext)
     logger = glueContext.get_logger()
+    logger.setLevel(logging.INFO)
 
     args = getResolvedOptions(
         sys.argv,
@@ -39,18 +40,16 @@ def main():
 
     sales_df = get_data_from_table(spark_session, database_name, sales_table_name)
     products_df = get_data_from_table(spark_session, database_name, product_table_name)
-    summary_df = daily_sales_by_category(products_df, sales_table_name)
+    summary_df = daily_sales_by_category(products_df, sales_df)
     update_table(summary_df, database_name, summary_table_name)
 
 
-def get_data_from_table(spark_session: SparkSession, database_name: str, sales_table_name: str) -> DataFrame:
-    pass
+def get_data_from_table(spark_session: SparkSession, database_name: str, table_name: str) -> DataFrame:
+    return spark_session.read.format("delta").table(f"{database_name}.{table_name}")
+
 
 def update_table(table_df: DataFrame, database_name: str, table_name: str) -> None:
-    client = boto3.client("glue")
-    response = client.get_table(DatabaseName=database_name, Name=table_name)
-    s3_target_location = response["Table"]["StorageDescriptor"]["Location"]
-    table_df.write.format("delta").mode("overwrite").save(s3_target_location)
+    table_df.write.format("delta").mode("overwrite").saveAsTable(f"{database_name}.{table_name}")
 
 
 def daily_sales_by_category(products_df: DataFrame, sales_df: DataFrame) -> DataFrame:
