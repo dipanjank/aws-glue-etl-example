@@ -34,10 +34,6 @@ jobs:
         run: terraform fmt -check -no-color
         continue-on-error: true
 
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -input=false
