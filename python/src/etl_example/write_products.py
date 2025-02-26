@@ -4,7 +4,9 @@ from datetime import date
 from random import choice
 
 from awsglue.context import GlueContext
+from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
+from pyspark.context import SparkContext
 from pyspark.sql import DataFrame
 from pyspark.sql import Row
 from pyspark.sql import SparkSession
@@ -12,16 +14,6 @@ from pyspark.sql import SparkSession
 
 def main():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    spark_session = SparkSession.builder \
-        .appName("WriteProducts") \
-        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
-        .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
-        .getOrCreate()
-
-    glueContext = GlueContext(spark_session.sparkContext)
-    logger = glueContext.get_logger()
-    logger.setLevel(logging.INFO)
-
     args = getResolvedOptions(
         sys.argv,
         [
@@ -31,6 +23,14 @@ def main():
             'sales_table_name',
         ]
     )
+    sc = SparkContext()
+    glueContext = GlueContext(sc)
+    spark_session = glueContext.spark_session
+    logger = glueContext.get_logger()
+    logger.setLevel(logging.INFO)
+
+    job = Job(glueContext)
+    job.init(args["JOB_NAME"], args)
 
     database_name = args['db_name']
     product_table_name = args['product_table_name']
@@ -43,6 +43,7 @@ def main():
     sales_df = get_sales(spark_session)
     update_table(sales_df, database_name, sales_table_name)
     logger.info("Updated sales Delta table successfully.")
+    job.commit()
 
 
 def update_table(table_df: DataFrame, database_name: str, table_name: str) -> None:
