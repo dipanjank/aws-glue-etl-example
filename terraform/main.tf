@@ -2,6 +2,11 @@ resource "aws_glue_catalog_database" "sales_db" {
   name = "sales"
 }
 
+resource "aws_s3_bucket" "sales_bucket" {
+  bucket = "dk-etl-sales-bucket"
+
+}
+
 resource "aws_glue_catalog_table" "products" {
   name          = "products"
   database_name = aws_glue_catalog_database.sales_db.name
@@ -15,7 +20,7 @@ resource "aws_glue_catalog_table" "products" {
   }
 
   storage_descriptor {
-    location      = "s3://my-lakehouse/silver/employee/"
+    location      = "s3://dk-etl-sales-bucket/bronze/products/"
     input_format  = "io.delta.sql.DeltaStorageHandler"
     output_format = "io.delta.sql.DeltaStorageHandler"
     ser_de_info {
