@@ -21,8 +21,8 @@ resource "aws_glue_catalog_table" "products" {
 
   storage_descriptor {
     location      = "s3://dk-etl-sales-bucket/bronze/products/"
-    input_format  = "io.delta.sql.DeltaStorageHandler"
-    output_format = "io.delta.sql.DeltaStorageHandler"
+    input_format  = "org.apache.hadoop.mapred.SequenceFileInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat"
     ser_de_info {
       serialization_library = "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"
     }
