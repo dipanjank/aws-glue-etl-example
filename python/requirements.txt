@@ -1,0 +1,2 @@
+pyspark<4
+boto3
