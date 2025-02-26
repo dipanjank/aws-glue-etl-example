@@ -1,12 +1,14 @@
 import logging
 import sys
+from datetime import date
+from random import choice
 
 import boto3
 from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 from pyspark.sql import DataFrame
+from pyspark.sql import Row
 from pyspark.sql import SparkSession
-from pyspark.sql import types as T
 
 
 def main():
@@ -24,43 +26,62 @@ def main():
         sys.argv,
         [
             'JOB_NAME',
-           'db_name',
-           'table_name',
+            'db_name',
+            'product_table_name',
+            'sales_table_name',
         ]
     )
 
     database_name = args['db_name']
-    table_name = args['table_name']
+    product_table_name = args['product_table_name']
+    sales_table_name = args['sales_table_name']
 
-    # Sample data
     products_df = get_products(spark_session)
+    update_table(products_df, database_name, product_table_name)
+    logger.info("Updated products Delta table successfully.")
 
-    # Get the S3 storage location from the Glue Data Catalog
+    sales_df = get_sales(spark_session)
+    update_table(sales_df, database_name, sales_table_name)
+    logger.info("Updated sales Delta table successfully.")
+
+
+def update_table(table_df: DataFrame, database_name: str, table_name: str) -> None:
     client = boto3.client("glue")
     response = client.get_table(DatabaseName=database_name, Name=table_name)
     s3_target_location = response["Table"]["StorageDescriptor"]["Location"]
-
-    # Write data to Delta table (S3 location)
-    products_df.write.format("delta").mode("overwrite").save(s3_target_location)
-    logger.info("Updated products Delta table successfully.")
+    table_df.write.format("delta").mode("overwrite").save(s3_target_location)
 
 
 def get_products(spark_session: SparkSession) -> DataFrame:
     data = [
-        ("P001", "Laptop", "Electronics"),
-        ("P002", "Phone", "Electronics"),
-        ("P003", "Shirt", "Clothing"),
-        ("P004", "Shoes", "Footwear"),
+        Row(product_id="P001", name="Laptop", category="Electronics"),
+        Row(product_id="P002", name="Phone", category="Electronics"),
+        Row(product_id="P003", name="Shirt", category="Clothing"),
+        Row(product_id="P004", name="Shoes", category="Footwear"),
     ]
-    # Convert to Spark DataFrame
-    products_df = spark_session.createDataFrame(
-        data,
-        schema=T.StructType(
+    products_df = spark_session.createDataFrame(data)
+    return products_df
+
+
+def get_sales(spark_session: SparkSession) -> DataFrame:
+    rows = []
+
+    for i in range(1, 1001):
+        sales_id = str(i)
+        product_id = choice(["P001", "P002", "P003", "P004"])
+        quantity = choice([1, 2, 3, 4, 5])
+        sale_date = choice(
             [
-                T.StructField("product_id", T.StringType(), True),
-                T.StructField("name", T.StringType(), True),
-                T.StructField("category", T.StringType(), True),
+                date(2025, 1, 1),
+                date(2025, 1, 2),
+                date(2025, 1, 3),
+                date(2025, 1, 4),
+                date(2025, 1, 5),
             ]
         )
-    )
-    return products_df
+        rows.append(
+            Row(sales_id=sales_id, product_id=product_id, quantity=quantity, sale_date=sale_date)
+        )
+
+    return spark_session.createDataFrame(rows)
+
