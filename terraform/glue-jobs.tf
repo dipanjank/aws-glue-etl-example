@@ -5,11 +5,11 @@ resource "aws_s3_bucket" "glue_scripts_bucket" {
 
 # Upload Glue script to S3 bucket
 resource "aws_s3_object" "glue_script" {
-  for_each = fileset("../python/etl_example/", "*.py")
+  for_each = fileset("${path.root}/../python/src/etl_example/", "*.py")
   bucket   = aws_s3_bucket.glue_scripts_bucket.bucket
   key      = "etl_example/${each.value}"
-  source   = "../python/etl_example/${each.value}"
-  etag     = filemd5("../python/etl_example/${each.value}")
+  source   = "${path.root}/../python/src/etl_example/${each.value}"
+  etag     = filemd5("${path.root}/../python/src/etl_example/${each.value}")
 }
 
 # Create IAM Role for Glue job
