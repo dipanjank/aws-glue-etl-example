@@ -65,7 +65,7 @@ resource "aws_iam_role_policy_attachment" "attach_glue_job_s3_policy" {
 
 # Create Glue Job to execute the script
 resource "aws_glue_job" "write_to_products" {
-  name         = "write-to-products-job"
+  name         = "write-to-products-and-sales-job"
   role_arn     = aws_iam_role.glue_job_role.arn
   glue_version = "4.0"
 
@@ -75,10 +75,11 @@ resource "aws_glue_job" "write_to_products" {
   }
 
   default_arguments = {
-    "--db_name"    = "salse"
-    "--table-name" = "products"
+    "--db_name"            = "salse"
+    "--product-table-name" = "products"
+    "--sales-table-name"   = "product_sales"
   }
 
   number_of_workers = 2
-  timeout      = 60 # Timeout in minutes
+  timeout           = 60 # Timeout in minutes
 }
