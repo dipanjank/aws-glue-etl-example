@@ -81,5 +81,6 @@ resource "aws_glue_job" "write_to_products" {
   }
 
   number_of_workers = 2
+  worker_type       = "G.1X"
   timeout           = 60 # Timeout in minutes
 }
