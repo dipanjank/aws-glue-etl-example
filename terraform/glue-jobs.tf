@@ -67,7 +67,7 @@ resource "aws_iam_role_policy_attachment" "attach_glue_job_s3_policy" {
 resource "aws_glue_job" "write_to_products" {
   name         = "write-to-products-and-sales-job"
   role_arn     = aws_iam_role.glue_job_role.arn
-  glue_version = "4.0"
+  glue_version = "5.0"
 
   command {
     script_location = "s3://${aws_s3_bucket.glue_scripts_bucket.bucket}/etl_example/write_products.py"

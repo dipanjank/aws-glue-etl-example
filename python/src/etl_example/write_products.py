@@ -20,6 +20,7 @@ def main():
 
     glueContext = GlueContext(spark_session.sparkContext)
     logger = glueContext.get_logger()
+    logger.setLevel(logging.INFO)
 
     args = getResolvedOptions(
         sys.argv,
@@ -45,9 +46,6 @@ def main():
 
 
 def update_table(table_df: DataFrame, database_name: str, table_name: str) -> None:
-    # client = boto3.client("glue")
-    # response = client.get_table(DatabaseName=database_name, Name=table_name)
-    # s3_target_location = response["Table"]["StorageDescriptor"]["Location"]
     table_df.write.format("delta").mode("overwrite").saveAsTable(f"{database_name}.{table_name}")
 
 
