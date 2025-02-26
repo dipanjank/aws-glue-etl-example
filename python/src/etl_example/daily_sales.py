@@ -42,6 +42,7 @@ def main():
     products_df = get_data_from_table(spark_session, database_name, product_table_name)
     summary_df = daily_sales_by_category(products_df, sales_df)
     update_table(summary_df, database_name, summary_table_name)
+    logger.info("Successfully updated daily sales table.")
 
 
 def get_data_from_table(spark_session: SparkSession, database_name: str, table_name: str) -> DataFrame:
@@ -56,8 +57,7 @@ def daily_sales_by_category(products_df: DataFrame, sales_df: DataFrame) -> Data
     return sales_df.join(
         products_df, on='product_id', how='inner'
     ).groupby(
-        "sales_date", "category"
+        "sale_date", "category"
     ).agg(
         F.sum("quantity").alias("total_quantity"),
     )
-
