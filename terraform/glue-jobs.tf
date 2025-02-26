@@ -71,7 +71,7 @@ resource "aws_glue_job" "write_to_products" {
 
   command {
     script_location = "s3://${aws_s3_bucket.glue_scripts_bucket.bucket}/etl_example/write_products.py"
-    python_version  = "3.9"
+    python_version  = "3"
   }
 
   default_arguments = {
