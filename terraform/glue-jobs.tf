@@ -63,6 +63,29 @@ resource "aws_iam_role_policy_attachment" "attach_glue_job_s3_policy" {
   policy_arn = aws_iam_policy.glue_job_s3_policy.arn
 }
 
+# Create Glue Job to execute the script
+resource "aws_glue_job" "write_to_products" {
+  name         = "write-to-products-and-sales-job"
+  role_arn     = aws_iam_role.glue_job_role.arn
+  glue_version = "5.0"
+
+  command {
+    script_location = "s3://${aws_s3_bucket.glue_scripts_bucket.bucket}/etl_example/write_products.py"
+    python_version  = "3"
+  }
+
+  default_arguments = {
+    "--db_name"            = "sales"
+    "--product-table-name" = "products"
+    "--sales-table-name"   = "product_sales"
+    "--datalake-formats"   = "delta"
+  }
+
+  number_of_workers = 2
+  worker_type       = "G.1X"
+  timeout           = 60 # Timeout in minutes
+}
+
 resource "aws_glue_job" "daily_total_sales" {
   name         = "daily-sales-by-category-job"
   role_arn     = aws_iam_role.glue_job_role.arn
