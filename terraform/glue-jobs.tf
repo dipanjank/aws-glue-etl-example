@@ -30,10 +30,37 @@ resource "aws_iam_role" "glue_job_role" {
   })
 }
 
+resource "aws_iam_policy" "glue_job_s3_policy" {
+  name        = "GlueJobS3Policy"
+  description = "Policy for Glue job to access S3 script"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:s3:::${aws_s3_bucket.glue_scripts_bucket.bucket}",
+          "arn:aws:s3:::${aws_s3_bucket.glue_scripts_bucket.bucket}/*"
+        ]
+      }
+    ]
+  })
+}
+
 # Attach policies to IAM role for Glue job
 resource "aws_iam_role_policy_attachment" "glue_job_policy" {
   role       = aws_iam_role.glue_job_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+}
+
+# Attach the policy to the Glue Job IAM role
+resource "aws_iam_role_policy_attachment" "attach_glue_job_s3_policy" {
+  role       = aws_iam_role.glue_job_role.name
+  policy_arn = aws_iam_policy.glue_job_s3_policy.arn
 }
 
 # Create Glue Job to execute the script
