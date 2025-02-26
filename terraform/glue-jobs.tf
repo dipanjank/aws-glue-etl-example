@@ -37,14 +37,20 @@ resource "aws_iam_role_policy_attachment" "glue_job_policy" {
 }
 
 # Create Glue Job to execute the script
-resource "aws_glue_job" "delta_write_job" {
-  name     = "write-to-delta-job"
-  role_arn = aws_iam_role.glue_job_role.arn
+resource "aws_glue_job" "write_to_products" {
+  name         = "write-to-products-job"
+  role_arn     = aws_iam_role.glue_job_role.arn
+  glue_version = "4.0"
 
   command {
     name            = "pythonshell"
     script_location = "s3://${aws_s3_bucket.glue_scripts_bucket.bucket}/python/etl_example/write_products.py"
     python_version  = "3"
+  }
+
+  default_arguments = {
+    "--db_name"    = "salse"
+    "--table-name" = "products"
   }
 
   max_capacity = 1  # Adjust according to the job's needs (number of DPU units)
