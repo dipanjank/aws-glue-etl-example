@@ -79,6 +79,6 @@ resource "aws_glue_job" "write_to_products" {
     "--table-name" = "products"
   }
 
-  max_capacity = 1  # Adjust according to the job's needs (number of DPU units)
+  max_capacity = 2 # Adjust according to the job's needs (number of DPU units)
   timeout      = 60 # Timeout in minutes (optional)
 }
