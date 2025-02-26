@@ -75,9 +75,10 @@ resource "aws_glue_job" "write_to_products" {
   }
 
   default_arguments = {
-    "--db_name"            = "salse"
+    "--db_name"            = "sales"
     "--product-table-name" = "products"
     "--sales-table-name"   = "product_sales"
+    "--datalake-formats"   = "delta"
   }
 
   number_of_workers = 2
