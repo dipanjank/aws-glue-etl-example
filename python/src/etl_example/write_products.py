@@ -1,8 +1,8 @@
-import logging
 import sys
 from datetime import date
 from random import choice
 
+import boto3
 from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 from pyspark import SparkConf
@@ -30,12 +30,9 @@ def main():
     spark_conf = SparkConf().setAll(conf_list)
     sc = SparkContext.getOrCreate(spark_conf)
     glue_context = GlueContext(sc)
+
     logger = glue_context.get_logger()
     spark_session = glue_context.spark_session
-
-    # List all tables in the current database
-    catalogs = spark_session.catalog.listCatalogs()
-    logger.warn(f"************** Catalogs: {catalogs} ***********************")
 
     database_name = args['db_name']
     product_table_name = args['product_table_name']
@@ -43,15 +40,18 @@ def main():
 
     products_df = get_products(spark_session)
     update_table(products_df, database_name, product_table_name)
-    logging.info("Updated products Delta table successfully.")
+    logger.info("Updated products Delta table successfully.")
 
-    # sales_df = get_sales(spark_session)
-    # update_table(sales_df, database_name, sales_table_name)
-    # logging.info("Updated sales Delta table successfully.")
+    sales_df = get_sales(spark_session)
+    update_table(sales_df, database_name, sales_table_name)
+    logger.info("Updated sales Delta table successfully.")
 
 
 def update_table(table_df: DataFrame, database_name: str, table_name: str) -> None:
-    table_df.write.format("delta").mode("overwrite").saveAsTable(f"{database_name}.{table_name}")
+    glue_client = boto3.client('glue')
+    response = glue_client.get_table(DatabaseName=database_name, Name=table_name)
+    external_location = response["Table"]['StorageDescriptor']['Location']
+    table_df.write.format("delta").mode("overwrite").save(external_location)
 
 
 def get_products(spark_session: SparkSession) -> DataFrame:
