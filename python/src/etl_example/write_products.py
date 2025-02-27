@@ -3,10 +3,7 @@ import sys
 from datetime import date
 from random import choice
 
-from awsglue.context import GlueContext
-from awsglue.job import Job
 from awsglue.utils import getResolvedOptions
-from pyspark.context import SparkContext
 from pyspark.sql import DataFrame
 from pyspark.sql import Row
 from pyspark.sql import SparkSession
@@ -23,13 +20,19 @@ def main():
             'sales_table_name',
         ]
     )
-    sc = SparkContext()
-    glueContext = GlueContext(sc)
-    spark_session = glueContext.spark_session
-    logger = glueContext.get_logger()
+    from pyspark.sql import SparkSession
 
-    job = Job(glueContext)
-    job.init(args["JOB_NAME"], args)
+    # Create a custom Spark session
+    spark_session = (
+        SparkSession.builder
+        .appName("GlueWithDelta")
+        .config("spark.sql.catalogImplementation", "hive") # Use Hive (Glue) catalog
+        .config("spark.sql.catalog.spark_catalog",
+                "org.apache.spark.sql.delta.catalog.DeltaCatalog")  # Use Delta for Delta tables
+        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")  # Enable Delta extensions for Spark SQL
+        .enableHiveSupport()
+        .getOrCreate()
+    )
 
     database_name = args['db_name']
     product_table_name = args['product_table_name']
@@ -37,12 +40,11 @@ def main():
 
     products_df = get_products(spark_session)
     update_table(products_df, database_name, product_table_name)
-    logger.info("Updated products Delta table successfully.")
+    logging.info("Updated products Delta table successfully.")
 
     sales_df = get_sales(spark_session)
     update_table(sales_df, database_name, sales_table_name)
-    logger.info("Updated sales Delta table successfully.")
-    job.commit()
+    logging.info("Updated sales Delta table successfully.")
 
 
 def update_table(table_df: DataFrame, database_name: str, table_name: str) -> None:
