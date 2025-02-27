@@ -18,6 +18,7 @@ resource "aws_glue_catalog_table" "products" {
   }
 
   storage_descriptor {
+    location      = "s3://${aws_s3_bucket.sales_bucket.bucket}/bronze/products/"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
@@ -98,7 +99,7 @@ resource "aws_glue_catalog_table" "daily_sales_by_category" {
   }
 
   storage_descriptor {
-    location      = "s3://${aws_s3_bucket.sales_bucket.bucket}/bronze/daily_sales_by_catgeory/"
+    location      = "s3://${aws_s3_bucket.sales_bucket.bucket}/silver/daily_sales_by_catgeory/"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
