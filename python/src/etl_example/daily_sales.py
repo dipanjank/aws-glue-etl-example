@@ -1,28 +1,15 @@
-import logging
 import sys
-from datetime import date
-from random import choice
 
-import boto3
 from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
+from pyspark import SparkConf
+from pyspark import SparkContext
 from pyspark.sql import DataFrame
-from pyspark.sql import functions as F
 from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
 
 
 def main():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    spark_session = SparkSession.builder \
-        .appName("DailySales") \
-        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
-        .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
-        .getOrCreate()
-
-    glueContext = GlueContext(spark_session.sparkContext)
-    logger = glueContext.get_logger()
-    logger.setLevel(logging.INFO)
-
     args = getResolvedOptions(
         sys.argv,
         [
@@ -30,9 +17,20 @@ def main():
             'db_name',
             'product_table_name',
             'sales_table_name',
-            'daily_summary_table_name',
         ]
     )
+
+    conf_list = [
+        ("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog"),
+        ("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+    ]
+    spark_conf = SparkConf().setAll(conf_list)
+    sc = SparkContext.getOrCreate(spark_conf)
+    glue_context = GlueContext(sc)
+
+    logger = glue_context.get_logger()
+    spark_session = glue_context.spark_session
+
     database_name = args['db_name']
     product_table_name = args['product_table_name']
     sales_table_name = args['sales_table_name']
