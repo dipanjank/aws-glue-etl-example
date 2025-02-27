@@ -83,3 +83,6 @@ def get_sales(spark_session: SparkSession) -> DataFrame:
 
     return spark_session.createDataFrame(rows)
 
+
+if __name__ == '__main__':
+    main()
