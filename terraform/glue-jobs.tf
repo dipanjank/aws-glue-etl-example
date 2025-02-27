@@ -76,8 +76,8 @@ resource "aws_glue_job" "write_to_products" {
 
   default_arguments = {
     "--db_name"            = "sales"
-    "--product-table-name" = "products"
-    "--sales-table-name"   = "product_sales"
+    "--product_table_name" = "products"
+    "--sales_table_name"   = "product_sales"
     "--datalake-formats"   = "delta"
   }
 
@@ -98,8 +98,8 @@ resource "aws_glue_job" "daily_total_sales" {
 
   default_arguments = {
     "--db_name"                  = "sales"
-    "--product-table-name"       = "products"
-    "--sales-table-name"         = "product_sales"
+    "--product_table_name"       = "products"
+    "--sales_table_name"         = "product_sales"
     "--daily_summary_table_name" = "daily_sales_by_catgeory"
     "--datalake-formats"         = "delta"
   }
