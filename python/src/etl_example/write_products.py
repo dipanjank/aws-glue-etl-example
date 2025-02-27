@@ -27,7 +27,6 @@ def main():
     glueContext = GlueContext(sc)
     spark_session = glueContext.spark_session
     logger = glueContext.get_logger()
-    logger.setLevel(logging.INFO)
 
     job = Job(glueContext)
     job.init(args["JOB_NAME"], args)
