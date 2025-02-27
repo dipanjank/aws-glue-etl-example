@@ -20,12 +20,7 @@ resource "aws_glue_catalog_table" "products" {
   }
 
   storage_descriptor {
-    location      = "s3://dk-etl-sales-bucket/bronze/products/"
-    input_format  = "org.apache.hadoop.mapred.SequenceFileInputFormat"
-    output_format = "org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat"
-    ser_de_info {
-      serialization_library = "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"
-    }
+    location = "s3://dk-etl-sales-bucket/bronze/products/"
     columns {
       name = "product_id"
       type = "string"
@@ -54,12 +49,8 @@ resource "aws_glue_catalog_table" "product_sales" {
   }
 
   storage_descriptor {
-    location      = "s3://dk-etl-sales-bucket/bronze/product_sales/"
-    input_format  = "org.apache.hadoop.mapred.SequenceFileInputFormat"
-    output_format = "org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat"
-    ser_de_info {
-      serialization_library = "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"
-    }
+    location = "s3://dk-etl-sales-bucket/bronze/product_sales/"
+
     columns {
       name = "sales_id"
       type = "string"
@@ -92,12 +83,8 @@ resource "aws_glue_catalog_table" "daily_sales_by_category" {
   }
 
   storage_descriptor {
-    location      = "s3://dk-etl-sales-bucket/bronze/daily_sales_by_catgeory/"
-    input_format  = "org.apache.hadoop.mapred.SequenceFileInputFormat"
-    output_format = "org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat"
-    ser_de_info {
-      serialization_library = "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"
-    }
+    location = "s3://dk-etl-sales-bucket/bronze/daily_sales_by_catgeory/"
+
     columns {
       name = "sale_date"
       type = "date"
