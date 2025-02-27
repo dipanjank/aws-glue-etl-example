@@ -8,5 +8,5 @@ terraform {
 }
 
 provider "aws" {
-  region = "eu-west-1"
+  region = local.aws_region
 }

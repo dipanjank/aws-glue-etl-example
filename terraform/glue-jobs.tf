@@ -80,9 +80,9 @@ resource "aws_iam_policy" "glue_catalog_policy" {
           "glue:*"
         ]
         Resource = [
-          "arn:aws:glue:us-east-1:${data.aws_caller_identity.current.account_id}:catalog",
-          "arn:aws:glue:us-east-1:${data.aws_caller_identity.current.account_id}:database/${aws_glue_catalog_database.sales_db.name}",
-          "arn:aws:glue:us-east-1:${data.aws_caller_identity.current.account_id}:table/${aws_glue_catalog_database.sales_db.name}/*",
+          "arn:aws:glue:${local.aws_region}:${data.aws_caller_identity.current.account_id}:catalog",
+          "arn:aws:glue:${local.aws_region}:${data.aws_caller_identity.current.account_id}:database/${aws_glue_catalog_database.sales_db.name}",
+          "arn:aws:glue:${local.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_glue_catalog_database.sales_db.name}/*",
         ]
       }
     ]
