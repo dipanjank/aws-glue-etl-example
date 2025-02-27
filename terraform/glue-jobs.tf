@@ -123,6 +123,7 @@ resource "aws_glue_job" "write_to_products_and_sales" {
     "--sales_table_name"                 = "product_sales"
     "--datalake-formats"                 = "delta"
     "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-glue-datacatalog"          = "true"
   }
 
   number_of_workers = 2

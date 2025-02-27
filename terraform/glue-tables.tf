@@ -14,13 +14,22 @@ resource "aws_glue_catalog_table" "products" {
   table_type = "EXTERNAL_TABLE"
 
   parameters = {
-    EXTERNAL             = "TRUE"
-    classification       = "delta"
-    "delta.table.format" = "delta"
+    classification = "delta"
   }
 
   storage_descriptor {
-    location = "s3://dk-etl-sales-bucket/bronze/products/"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "delta-serde"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+      parameters = {
+        "serialization.format" = "1"
+      }
+    }
+
     columns {
       name = "product_id"
       type = "string"
@@ -43,13 +52,21 @@ resource "aws_glue_catalog_table" "product_sales" {
   table_type = "EXTERNAL_TABLE"
 
   parameters = {
-    EXTERNAL             = "TRUE"
-    classification       = "delta"
-    "delta.table.format" = "delta"
+    classification = "delta"
   }
-
   storage_descriptor {
-    location = "s3://dk-etl-sales-bucket/bronze/product_sales/"
+    location      = "s3://dk-etl-sales-bucket/bronze/product_sales/"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "delta-serde"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+      parameters = {
+        "serialization.format" = "1"
+      }
+    }
 
     columns {
       name = "sales_id"
@@ -77,13 +94,22 @@ resource "aws_glue_catalog_table" "daily_sales_by_category" {
   table_type = "EXTERNAL_TABLE"
 
   parameters = {
-    EXTERNAL             = "TRUE"
-    classification       = "delta"
-    "delta.table.format" = "delta"
+    classification = "delta"
   }
 
   storage_descriptor {
-    location = "s3://dk-etl-sales-bucket/bronze/daily_sales_by_catgeory/"
+    location      = "s3://dk-etl-sales-bucket/bronze/daily_sales_by_catgeory/"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    ser_de_info {
+      name                  = "delta-serde"
+      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+      parameters = {
+        "serialization.format" = "1"
+      }
+    }
 
     columns {
       name = "sale_date"

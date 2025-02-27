@@ -48,10 +48,7 @@ def main():
 
 
 def update_table(table_df: DataFrame, database_name: str, table_name: str) -> None:
-    glue_client = boto3.client('glue')
-    response = glue_client.get_table(DatabaseName=database_name, Name=table_name)
-    external_location = response["Table"]['StorageDescriptor']['Location']
-    table_df.write.format("delta").mode("overwrite").save(external_location)
+    table_df.write.format("delta").mode("overwrite").saveAsTable(f"{database_name}.{table_name}")
 
 
 def get_products(spark_session: SparkSession) -> DataFrame:
