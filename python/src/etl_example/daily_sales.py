@@ -1,5 +1,6 @@
 import sys
 
+import boto3
 from awsglue.context import GlueContext
 from awsglue.utils import getResolvedOptions
 from pyspark import SparkConf
@@ -49,7 +50,10 @@ def get_data_from_table(spark_session: SparkSession, database_name: str, table_n
 
 
 def update_table(table_df: DataFrame, database_name: str, table_name: str) -> None:
-    table_df.write.format("delta").mode("overwrite").saveAsTable(f"{database_name}.{table_name}")
+    glue_client = boto3.client('glue')
+    response = glue_client.get_table(DatabaseName=database_name, Name=table_name)
+    external_location = response["Table"]['StorageDescriptor']['Location']
+    table_df.write.format("delta").mode("overwrite").save(external_location)
 
 
 def daily_sales_by_category(products_df: DataFrame, sales_df: DataFrame) -> DataFrame:
