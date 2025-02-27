@@ -142,11 +142,13 @@ resource "aws_glue_job" "daily_total_sales" {
   }
 
   default_arguments = {
-    "--db_name"                  = "sales"
-    "--product_table_name"       = "products"
-    "--sales_table_name"         = "product_sales"
-    "--daily_summary_table_name" = "daily_sales_by_catgeory"
-    "--datalake-formats"         = "delta"
+    "--db_name"                          = "sales"
+    "--product_table_name"               = "products"
+    "--sales_table_name"                 = "product_sales"
+    "--daily_summary_table_name"         = "daily_sales_by_category"
+    "--datalake-formats"                 = "delta"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-glue-datacatalog"          = "true"
   }
 
   number_of_workers = 2

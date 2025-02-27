@@ -3,8 +3,8 @@ resource "aws_s3_bucket" "sales_bucket" {
 }
 
 resource "aws_glue_catalog_database" "sales_db" {
-  name = "sales"
-  location_uri = "s3://${aws_s3_bucket.sales_bucket.bucket}/sales_db"
+  name         = "sales"
+  location_uri = "s3://${aws_s3_bucket.sales_bucket.bucket}/sales"
 }
 
 resource "aws_glue_catalog_table" "products" {
@@ -18,7 +18,7 @@ resource "aws_glue_catalog_table" "products" {
   }
 
   storage_descriptor {
-    location      = "s3://${aws_s3_bucket.sales_bucket.bucket}/bronze/products/"
+    location      = "s3://${aws_s3_bucket.sales_bucket.bucket}/sales/products/"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
@@ -56,7 +56,7 @@ resource "aws_glue_catalog_table" "product_sales" {
     classification = "delta"
   }
   storage_descriptor {
-    location      = "s3://${aws_s3_bucket.sales_bucket.bucket}/bronze/product_sales/"
+    location      = "s3://${aws_s3_bucket.sales_bucket.bucket}/sales/product_sales/"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
@@ -99,7 +99,7 @@ resource "aws_glue_catalog_table" "daily_sales_by_category" {
   }
 
   storage_descriptor {
-    location      = "s3://${aws_s3_bucket.sales_bucket.bucket}/silver/daily_sales_by_catgeory/"
+    location      = "s3://${aws_s3_bucket.sales_bucket.bucket}/sales/daily_sales_by_catgeory/"
     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
