@@ -101,7 +101,7 @@ resource "aws_iam_role_policy_attachment" "attach_glue_job_s3_policy" {
 }
 
 
-resource "aws_iam_role_policy_attachment" "attach_glue_job_s3_policy" {
+resource "aws_iam_role_policy_attachment" "attach_glue_job_catalog_policy" {
   role       = aws_iam_role.glue_job_role.name
   policy_arn = aws_iam_policy.glue_catalog_policy.arn
 }
