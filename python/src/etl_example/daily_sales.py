@@ -17,6 +17,7 @@ def main():
             'db_name',
             'product_table_name',
             'sales_table_name',
+            'daily_summary_table_name'
         ]
     )
 
