@@ -61,3 +61,7 @@ def daily_sales_by_category(products_df: DataFrame, sales_df: DataFrame) -> Data
     ).agg(
         F.sum("quantity").alias("total_quantity"),
     )
+
+
+if __name__ == '__main__':
+    main()
