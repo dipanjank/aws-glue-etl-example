@@ -3,6 +3,8 @@ resource "aws_s3_bucket" "glue_scripts_bucket" {
   bucket = "etl-example-glue-scripts"
 }
 
+data "aws_caller_identity" "current" {}
+
 # Upload Glue script to S3 bucket
 resource "aws_s3_object" "glue_script" {
   for_each = fileset("${path.root}/../python/src/etl_example/", "*.py")
@@ -30,6 +32,9 @@ resource "aws_iam_role" "glue_job_role" {
   })
 }
 
+# IAM Policy for S3
+# 1. Read only for the scripts bucket
+# 2. Read / Write for the data bucket
 resource "aws_iam_policy" "glue_job_s3_policy" {
   name        = "GlueJobS3Policy"
   description = "Policy for Glue job to access S3 script"
@@ -46,6 +51,39 @@ resource "aws_iam_policy" "glue_job_s3_policy" {
           "arn:aws:s3:::${aws_s3_bucket.glue_scripts_bucket.bucket}",
           "arn:aws:s3:::${aws_s3_bucket.glue_scripts_bucket.bucket}/*"
         ]
+      },
+      {
+        Action = [
+          "s3:*"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:s3:::${aws_s3_bucket.sales_bucket.bucket}",
+          "arn:aws:s3:::${aws_s3_bucket.sales_bucket.bucket}/*"
+        ]
+      }
+    ]
+  })
+}
+
+# IAM Policy for the Glue Catalog / Database
+resource "aws_iam_policy" "glue_catalog_policy" {
+  name        = "GlueDeltaWritePolicy"
+  description = "Allows Glue ETL jobs to write to a Delta table in Glue Data Catalog and S3"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "glue:*"
+        ]
+        Resource = [
+          "arn:aws:glue:us-east-1:${data.aws_caller_identity.current.account_id}:catalog",
+          "arn:aws:glue:us-east-1:${data.aws_caller_identity.current.account_id}:database/${aws_glue_catalog_database.sales_db.name}",
+          "arn:aws:glue:us-east-1:${data.aws_caller_identity.current.account_id}:table/${aws_glue_catalog_database.sales_db.name}/*",
+        ]
       }
     ]
   })
@@ -57,10 +95,15 @@ resource "aws_iam_role_policy_attachment" "glue_job_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }
 
-# Attach the policy to the Glue Job IAM role
 resource "aws_iam_role_policy_attachment" "attach_glue_job_s3_policy" {
   role       = aws_iam_role.glue_job_role.name
   policy_arn = aws_iam_policy.glue_job_s3_policy.arn
+}
+
+
+resource "aws_iam_role_policy_attachment" "attach_glue_job_s3_policy" {
+  role       = aws_iam_role.glue_job_role.name
+  policy_arn = aws_iam_policy.glue_catalog_policy.arn
 }
 
 # Create Glue Job to execute the script
