@@ -20,18 +20,32 @@ resource "aws_lakeformation_permissions" "glue_etl_permissions" {
 }
 
 # Lake Formation permissions for the ETL role
-resource "aws_lakeformation_permissions" "glue_etl_permissions" {
-  for_each = {
-    products                = aws_glue_catalog_table.products.name
-    product_sales           = aws_glue_catalog_table.product_sales.name
-    daily_sales_by_category = aws_glue_catalog_table.daily_sales_by_category.name
-  }
-
+resource "aws_lakeformation_permissions" "lf_products_permission" {
   principal   = aws_iam_role.glue_job_role.arn
-  permissions = ["SELECT", "INSERT", "ALTER", "DELETE", "DESCRIBE"] # Fixed typo
+  permissions = ["SELECT", "INSERT", "ALTER", "DELETE", "DESCRIBE"]
 
   table {
     database_name = aws_glue_catalog_database.sales_db.name
-    table_name    = each.value
+    table_name    = aws_glue_catalog_table.products.name
+  }
+}
+
+resource "aws_lakeformation_permissions" "lf_product_sales_permission" {
+  principal   = aws_iam_role.glue_job_role.arn
+  permissions = ["SELECT", "INSERT", "ALTER", "DELETE", "DESCRIBE"]
+
+  table {
+    database_name = aws_glue_catalog_database.sales_db.name
+    table_name    = aws_glue_catalog_table.product_sales.name
+  }
+}
+
+resource "aws_lakeformation_permissions" "lf_daily_sales_permission" {
+  principal   = aws_iam_role.glue_job_role.arn
+  permissions = ["SELECT", "INSERT", "ALTER", "DELETE", "DESCRIBE"]
+
+  table {
+    database_name = aws_glue_catalog_database.sales_db.name
+    table_name    = aws_glue_catalog_table.daily_sales_by_category.name
   }
 }
