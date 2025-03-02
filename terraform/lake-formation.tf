@@ -19,19 +19,19 @@ resource "aws_lakeformation_permissions" "glue_etl_permissions" {
   }
 }
 
-# Lake Formation permissions for the ETL job
+# Lake Formation permissions for the ETL role
 resource "aws_lakeformation_permissions" "glue_etl_permissions" {
-  for_each = toset([
-    aws_glue_catalog_table.products.name,
-    aws_glue_catalog_table.product_sales.name,
-    aws_glue_catalog_table.daily_sales_by_category.name,
-  ])
+  for_each = {
+    products                = aws_glue_catalog_table.products.name
+    product_sales           = aws_glue_catalog_table.product_sales.name
+    daily_sales_by_category = aws_glue_catalog_table.daily_sales_by_category.name
+  }
 
   principal   = aws_iam_role.glue_job_role.arn
-  permissions = ["SELECT", "INSERT", "ALTER", "DELTE", "DESCRIBE"]
+  permissions = ["SELECT", "INSERT", "ALTER", "DELETE", "DESCRIBE"] # Fixed typo
 
   table {
     database_name = aws_glue_catalog_database.sales_db.name
-    table_name    = each.key
+    table_name    = each.value
   }
 }
