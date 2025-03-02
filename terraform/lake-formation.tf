@@ -4,48 +4,25 @@ resource "aws_lakeformation_data_lake_settings" "lakeformation_admin" {
 }
 
 # Register the S3 bucket as a Lake Formation resource
-resource "aws_lakeformation_resource" "lakeformation_bucket" {
+resource "aws_lakeformation_resource" "sales_bucket_resource" {
   arn = aws_s3_bucket.sales_bucket.arn
 }
 
 # Lake Formation permissions for the ETL job
-resource "aws_lakeformation_permissions" "glue_etl_permissions" {
+resource "aws_lakeformation_permissions" "lf_s3_access" {
   principal   = aws_iam_role.glue_job_role.arn
-  permissions = ["SELECT", "INSERT", "ALTER", "DESCRIBE"]
+  permissions = ["DATA_LOCATION_ACCESS"]
 
-  table {
-    database_name = aws_glue_catalog_database.sales_db.name
-    table_name    = aws_glue_catalog_table.products.name
+  data_location {
+    arn = aws_lakeformation_resource.sales_bucket_resource.arn
   }
 }
 
-# Lake Formation permissions for the ETL role
-resource "aws_lakeformation_permissions" "lf_products_permission" {
+resource "aws_lakeformation_permissions" "lf_database_access" {
   principal   = aws_iam_role.glue_job_role.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DELETE", "DESCRIBE"]
 
-  table {
-    database_name = aws_glue_catalog_database.sales_db.name
-    table_name    = aws_glue_catalog_table.products.name
-  }
-}
-
-resource "aws_lakeformation_permissions" "lf_product_sales_permission" {
-  principal   = aws_iam_role.glue_job_role.arn
-  permissions = ["SELECT", "INSERT", "ALTER", "DELETE", "DESCRIBE"]
-
-  table {
-    database_name = aws_glue_catalog_database.sales_db.name
-    table_name    = aws_glue_catalog_table.product_sales.name
-  }
-}
-
-resource "aws_lakeformation_permissions" "lf_daily_sales_permission" {
-  principal   = aws_iam_role.glue_job_role.arn
-  permissions = ["SELECT", "INSERT", "ALTER", "DELETE", "DESCRIBE"]
-
-  table {
-    database_name = aws_glue_catalog_database.sales_db.name
-    table_name    = aws_glue_catalog_table.daily_sales_by_category.name
+  database {
+    name = aws_glue_catalog_database.sales_db.name
   }
 }
