@@ -84,6 +84,13 @@ resource "aws_iam_policy" "glue_catalog_policy" {
           "arn:aws:glue:${local.aws_region}:${data.aws_caller_identity.current.account_id}:database/${aws_glue_catalog_database.sales_db.name}",
           "arn:aws:glue:${local.aws_region}:${data.aws_caller_identity.current.account_id}:table/${aws_glue_catalog_database.sales_db.name}/*",
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "lakeformation:GetDataAccess"
+        ]
+        Resource = "*"
       }
     ]
   })
