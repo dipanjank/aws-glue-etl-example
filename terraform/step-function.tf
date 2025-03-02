@@ -48,31 +48,31 @@ resource "aws_iam_role_policy_attachment" "step_functions_role_policy" {
   policy_arn = aws_iam_policy.step_functions_policy.arn
 }
 
-resource "aws_sfn_state_machine" "glue_jobs_state_machine" {
-  name       = "run-example-etl-jobs-sm"
-  role_arn   = aws_iam_role.example_etl_step_functions_role.arn
-  definition = <<EOF
-{
-  "Comment": "Run ETL Example Jobs",
-  "StartAt": "WriteToProductsAndSalesJob",
-  "States": {
-    "WriteToProductsAndSalesJob": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::glue:startJobRun.sync",
-      "Parameters": {
-        "JobName": "${aws_glue_job.write_to_products_and_sales.name}"
-      },
-      "Next": "DailySalesByCategoryJob"
-    },
-    "DailySalesByCategoryJob": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::glue:startJobRun.sync",
-      "Parameters": {
-        "JobName": "${aws_glue_job.daily_total_sales.name}"
-      },
-      "End": true
-    }
-  }
-}
-EOF
-}
+# resource "aws_sfn_state_machine" "glue_jobs_state_machine" {
+#   name       = "run-example-etl-jobs-sm"
+#   role_arn   = aws_iam_role.example_etl_step_functions_role.arn
+#   definition = <<EOF
+# {
+#   "Comment": "Run ETL Example Jobs",
+#   "StartAt": "WriteToProductsAndSalesJob",
+#   "States": {
+#     "WriteToProductsAndSalesJob": {
+#       "Type": "Task",
+#       "Resource": "arn:aws:states:::glue:startJobRun.sync",
+#       "Parameters": {
+#         "JobName": "${aws_glue_job.write_to_products_and_sales.name}"
+#       },
+#       "Next": "DailySalesByCategoryJob"
+#     },
+#     "DailySalesByCategoryJob": {
+#       "Type": "Task",
+#       "Resource": "arn:aws:states:::glue:startJobRun.sync",
+#       "Parameters": {
+#         "JobName": "${aws_glue_job.daily_total_sales.name}"
+#       },
+#       "End": true
+#     }
+#   }
+# }
+# EOF
+# }
