@@ -1,15 +1,13 @@
 # Make the current Terraform executing user a Lake Formation administrator
 resource "aws_lakeformation_data_lake_settings" "lakeformation_admin" {
-  admins = [data.aws_caller_identity.current.account_id]
+  admins = [data.aws_caller_identity.current.arn]
 
   create_database_default_permissions {
     permissions = ["ALL"]
-    principal   = data.aws_caller_identity.current.arn
   }
 
   create_table_default_permissions {
     permissions = ["ALL"]
-    principal   = data.aws_caller_identity.current.arn
   }
 }
 
