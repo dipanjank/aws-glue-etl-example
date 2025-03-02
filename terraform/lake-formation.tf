@@ -18,12 +18,32 @@ resource "aws_lakeformation_permissions" "lf_s3_access" {
   }
 }
 
-resource "aws_lakeformation_permissions" "lf_sales_table_access" {
+resource "aws_lakeformation_permissions" "lf_sales_product_access" {
   principal   = aws_iam_role.glue_job_role.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DELETE"]
 
   table {
-    name          = "*"
+    name          = aws_glue_catalog_table.products.name
+    database_name = aws_glue_catalog_database.sales_db.name
+  }
+}
+
+resource "aws_lakeformation_permissions" "lf_sales_product_sales_access" {
+  principal   = aws_iam_role.glue_job_role.arn
+  permissions = ["SELECT", "INSERT", "ALTER", "DELETE"]
+
+  table {
+    name          = aws_glue_catalog_table.product_sales.name
+    database_name = aws_glue_catalog_database.sales_db.name
+  }
+}
+
+resource "aws_lakeformation_permissions" "lf_sales_daily_sales_access" {
+  principal   = aws_iam_role.glue_job_role.arn
+  permissions = ["SELECT", "INSERT", "ALTER", "DELETE"]
+
+  table {
+    name          = aws_glue_catalog_table.daily_sales_by_category.name
     database_name = aws_glue_catalog_database.sales_db.name
   }
 }
