@@ -21,11 +21,11 @@ resource "aws_lakeformation_permissions" "glue_etl_permissions" {
 
 # Lake Formation permissions for the ETL job
 resource "aws_lakeformation_permissions" "glue_etl_permissions" {
-  for_each = [
+  for_each = toset([
     aws_glue_catalog_table.products.name,
     aws_glue_catalog_table.product_sales.name,
     aws_glue_catalog_table.daily_sales_by_category.name,
-  ]
+  ])
 
   principal   = aws_iam_role.glue_job_role.arn
   permissions = ["SELECT", "INSERT", "ALTER", "DELTE", "DESCRIBE"]
