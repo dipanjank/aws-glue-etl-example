@@ -3,7 +3,7 @@ resource "aws_lakeformation_data_lake_settings" "lakeformation_admin" {
   admins = [data.aws_caller_identity.current.arn]
 
   create_database_default_permissions {
-    permissions = ["SELECT", "ALTER", "DROP"]
+    permissions = ["ALL"]
     principal   = data.aws_caller_identity.current.arn
   }
 
