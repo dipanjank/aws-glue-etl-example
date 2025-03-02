@@ -3,6 +3,16 @@ data "aws_caller_identity" "current" {}
 # Make the current Terraform executing user a Lake Formation administrator
 resource "aws_lakeformation_data_lake_settings" "lakeformation_admin" {
   admins = [data.aws_caller_identity.current.arn]
+
+  create_database_default_permissions {
+    permissions = ["SELECT", "ALTER", "DROP"]
+    principal   = data.aws_caller_identity.current.arn
+  }
+
+  create_table_default_permissions {
+    permissions = ["ALL"]
+    principal   = data.aws_caller_identity.current.arn
+  }
 }
 
 # Register the S3 bucket as a Lake Formation resource
