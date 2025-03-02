@@ -112,53 +112,53 @@ resource "aws_iam_role_policy_attachment" "attach_glue_job_catalog_policy" {
   role       = aws_iam_role.glue_job_role.name
   policy_arn = aws_iam_policy.glue_catalog_policy.arn
 }
-#
-# # Create Glue Job to execute the script
-# resource "aws_glue_job" "write_to_products_and_sales" {
-#   name         = "write-to-products-and-sales-job"
-#   role_arn     = aws_iam_role.glue_job_role.arn
-#   glue_version = "5.0"
-#
-#   command {
-#     script_location = "s3://${aws_s3_bucket.glue_scripts_bucket.bucket}/etl_example/write_products.py"
-#     python_version  = "3"
-#   }
-#
-#   default_arguments = {
-#     "--db_name"                          = "sales"
-#     "--product_table_name"               = "products"
-#     "--sales_table_name"                 = "product_sales"
-#     "--datalake-formats"                 = "delta"
-#     "--enable-continuous-cloudwatch-log" = "true"
-#     "--enable-glue-datacatalog"          = "true"
-#   }
-#
-#   number_of_workers = 2
-#   worker_type       = "G.1X"
-#   timeout           = 60 # Timeout in minutes
-# }
-#
-# resource "aws_glue_job" "daily_total_sales" {
-#   name         = "daily-sales-by-category-job"
-#   role_arn     = aws_iam_role.glue_job_role.arn
-#   glue_version = "5.0"
-#
-#   command {
-#     script_location = "s3://${aws_s3_bucket.glue_scripts_bucket.bucket}/etl_example/daily_sales.py"
-#     python_version  = "3"
-#   }
-#
-#   default_arguments = {
-#     "--db_name"                          = "sales"
-#     "--product_table_name"               = "products"
-#     "--sales_table_name"                 = "product_sales"
-#     "--daily_summary_table_name"         = "daily_sales_by_category"
-#     "--datalake-formats"                 = "delta"
-#     "--enable-continuous-cloudwatch-log" = "true"
-#     "--enable-glue-datacatalog"          = "true"
-#   }
-#
-#   number_of_workers = 2
-#   worker_type       = "G.1X"
-#   timeout           = 60 # Timeout in minutes
-# }
+
+# Create Glue Job to execute the script
+resource "aws_glue_job" "write_to_products_and_sales" {
+  name         = "write-to-products-and-sales-job"
+  role_arn     = aws_iam_role.glue_job_role.arn
+  glue_version = "5.0"
+
+  command {
+    script_location = "s3://${aws_s3_bucket.glue_scripts_bucket.bucket}/etl_example/write_products.py"
+    python_version  = "3"
+  }
+
+  default_arguments = {
+    "--db_name"                          = "sales"
+    "--product_table_name"               = "products"
+    "--sales_table_name"                 = "product_sales"
+    "--datalake-formats"                 = "delta"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-glue-datacatalog"          = "true"
+  }
+
+  number_of_workers = 2
+  worker_type       = "G.1X"
+  timeout           = 60 # Timeout in minutes
+}
+
+resource "aws_glue_job" "daily_total_sales" {
+  name         = "daily-sales-by-category-job"
+  role_arn     = aws_iam_role.glue_job_role.arn
+  glue_version = "5.0"
+
+  command {
+    script_location = "s3://${aws_s3_bucket.glue_scripts_bucket.bucket}/etl_example/daily_sales.py"
+    python_version  = "3"
+  }
+
+  default_arguments = {
+    "--db_name"                          = "sales"
+    "--product_table_name"               = "products"
+    "--sales_table_name"                 = "product_sales"
+    "--daily_summary_table_name"         = "daily_sales_by_category"
+    "--datalake-formats"                 = "delta"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-glue-datacatalog"          = "true"
+  }
+
+  number_of_workers = 2
+  worker_type       = "G.1X"
+  timeout           = 60 # Timeout in minutes
+}
