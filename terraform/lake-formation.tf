@@ -20,7 +20,7 @@ resource "aws_lakeformation_permissions" "lf_s3_access" {
 
 resource "aws_lakeformation_permissions" "lf_sales_db_access" {
   principal   = aws_iam_role.glue_job_role.arn
-  permissions = ["SELECT", "INSERT", "ALTER", "DELETE", "DESCRIBE"]
+  permissions = ["SELECT", "INSERT", "ALTER", "DELETE"]
 
   database {
     name = aws_glue_catalog_database.sales_db.name
