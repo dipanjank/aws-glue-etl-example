@@ -1,5 +1,3 @@
-data "aws_caller_identity" "current" {}
-
 # Make the current Terraform executing user a Lake Formation administrator
 resource "aws_lakeformation_data_lake_settings" "lakeformation_admin" {
   admins = [data.aws_caller_identity.current.arn]
